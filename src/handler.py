@@ -18,7 +18,7 @@ def get_synonyms(response):
     synonyms = synonyms_str.split('|')
     return synonyms
 
-def build_url(baseurl, path, args_dict):
+def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
     
     args:
@@ -45,10 +45,7 @@ def request(word, key, output_type = 'json', language = 'en_US'):
     args_dict[KEY] = key
     args_dict[KEY_OUTPUT] = output_type
     args_dict[KEY_LANGUAGE] = language
-    url = build_url(BASE_URL, PATH, args_dict)
+    url = _build_url(BASE_URL, PATH, args_dict)
 
     response = urllib2.urlopen(url).next()
     return response
-
-a = request("GABA", API_KEY)
-syn = get_synonyms(a)
