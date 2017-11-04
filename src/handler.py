@@ -14,7 +14,7 @@ OUTPUT_TYPE = 'json'
 
 #Map POS (spaCy form) to api
 #PUNCT, PART, SYM, X, INTJ are insignificant pos
-POS_MAP = {'PUNCT': -1, 'PART': -1, 'SYM': -1, 'X': -1, 'INTJ': -1, 'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)'}
+POS_MAP = {'VERB': '(verb)', 'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)'}
 
 def get_synonyms(response):
     '''get the returned list of synonyms from a given response'''
