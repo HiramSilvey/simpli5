@@ -1,12 +1,14 @@
+import handler
 import pickle
 import spacy
+import json
 from stemming.porter2 import stem
 import nltk
 nlp = spacy.load('en')
 
 #Map POS (spaCy form) to api
 #PUNCT, PART, SYM, X, INTJ are insignificant pos
-POS_MAP = {'PUNCT': -1, 'PART': -1, 'SYM': -1, 'X': -1, 'INTJ': -1, 'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)'}
+POS_MAP = {'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)', 'VERB': '(verb)'}
 
 class token:
     def __init__(self, word, pos, lemma_):
@@ -22,7 +24,6 @@ class token:
 
     def get_lemma(self):
         return self.lemma_
-
 
 def tokenize(sentence):
     '''
@@ -51,30 +52,40 @@ def tokenize(sentence):
 
 def get_best_synonym(word_token):
     '''get the returned list of synonyms from a given response'''
+    word = word_token.get_word()
     try:
         pos = POS_MAP[word_token.get_pos()]
-        json_resp = json.loads(request(word_token.get_word()))['response']
+        json_resp = json.loads(handler.request(word))['response']
     except:
-        return word_token.get_word()
+        return word
     synonyms = []
     for w_type in json_resp:
         if w_type['list']['category'] == pos:
             synonyms.extend(w_type['list']['synonyms'].split('|'))
     most_freq = ('', 0)
     tenK = pickle.load(open('../data/tenK.words', 'rb'))
-    print(synonyms)
     for synonym in synonyms:
         score = 0
-        for syn_token in synonym.split():
+        syn_tokens = synonym.split()
+        synonym_len = len(syn_tokens)
+        for syn_token in syn_tokens:
+            if syn_token == word:
+                synonym_len -= 1
+                continue
             syn = stem(syn_token)
             if tenK.get(syn) != None:
                 score += tenK[syn]
             else:
                 score = 0
                 break
-        score = score/float(len(synonym))
+        try:
+            score = score/float(synonym_len)
+        except:
+            score = 0
         if score > most_freq[1]:
             most_freq = (synonym, score)
+    if most_freq[1] == 0:
+        return word
     return most_freq[0]
 
 def eli5(tokens):
