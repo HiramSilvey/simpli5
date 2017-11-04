@@ -12,6 +12,9 @@ KEY = 'key'
 KEY_OUTPUT = 'output'
 OUTPUT_TYPE = 'json'
 
+WIKI_BASE_URL = "https://en.wikipedia.org/wiki/"
+
+
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
 
@@ -43,3 +46,16 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
 
     response = urllib2.urlopen(url).next()
     return response
+
+def wiki_request(word):
+    '''
+    Send GET request to wiki
+    '''
+    word = word.replace(' ', '_')
+    word = word.replace("'", "%27")
+
+    url = _build_url(WIKI_BASE_URL,word, {})
+    print url
+    return url
+wiki_request("Alzheimer's disease")
+
