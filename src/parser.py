@@ -17,7 +17,6 @@ class token:
     def get_lemma(self):
         return self.lemma_
 
-
 def parse(sentence):
     '''
     Parse sentense and identify the pos and lemma_ of each word.
@@ -43,7 +42,3 @@ def parse(sentence):
             tokens.append(t)
             idx+=1
     return tokens
-
-'''
-parse("My grandmother developed Alzheimer's disease.")
-'''
