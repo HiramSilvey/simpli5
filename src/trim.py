@@ -9,4 +9,13 @@ from docopt import docopt
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-    print(args)
+    lib = []
+    for line in open(args['INPUT_FILE']):
+        line = line.rstrip('\n')
+        lib.append(stem(line))
+
+    f = open(args['OUTPUT_FILE'], 'w')
+    for i in range(len(lib)):
+        f.write(lib[i] + '\n')
+
+    f.close()
