@@ -11,8 +11,8 @@ if __name__ == '__main__':
     args = docopt(__doc__)
     lib = []
     for line in open(args['INPUT_FILE']):
-        line = line.rstrip('\n')
-        lib.append(stem(line))
+        line = line.split()
+        lib.append(stem(line[0]))
 
     f = open(args['OUTPUT_FILE'], 'w')
     for i in range(len(lib)):
