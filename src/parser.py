@@ -37,6 +37,14 @@ def tokenize(sentence):
                 del tokens[-1]
                 tokens.append(combine)
                 idx+=2
+            elif len(tokens) != 0:
+                part_token = token(word.lower_, word.pos, word.lemma_)
+                combine = (tokens[-1], part_token)
+                del tokens[-1]
+                tokens.append(combine)
+                idx+=1
+            else:
+                idx+=1
         else:
             param = [word.text, word.pos_, word.lemma_]
             t = token(*param)
@@ -51,9 +59,13 @@ def eli5(tokens):
         if type(tok) == tuple:
             a = tok[0]
             b = tok[1]
-            c = tok[2]
-            word = ' '.join(a.get_word()+b.get_word(), c.get_word())
-            if not a.get_word() in tenK or not c.get_word() in tenK:
+            c = None
+            if len(tuple) == 3:
+                c = tok[2]
+                word = ' '.join(a.get_word()+b.get_word(), c.get_word())
+            else:
+                word = a.get_word() + b.get_word()
+            if not a.get_word() in tenK or (c is not None and not c.get_word() in tenK):
                 word = get_best_synonym(token(word, c.get_pos(), word.lemma_))
         else:
             word = tok.get_word()
