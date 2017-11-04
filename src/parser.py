@@ -33,31 +33,26 @@ def tokenize(sentence):
     '''
     doc = nlp(sentence.decode('utf-8'))
     tokens = []
-    idx = 0
-    while idx < len(doc):
-        word = doc[idx]
-        if word.pos_ == 'PART':
-            if len(tokens) != 0 and idx + 1 < len(doc) and doc[idx+1].pos_ == 'NOUN':
-                part_token = token(word.lower_, word.pos, word.lemma_)
-                noun_token = token(doc[idx+1].lower_, doc[idx+1].pos, doc[idx+1].lemma_)
-                combine = (tokens[-1], part_token, noun_token)
-                del tokens[-1]
-                tokens.append(combine)
-                idx+=2
-            elif len(tokens) != 0:
-                part_token = token(word.lower_, word.pos, word.lemma_)
-                combine = (tokens[-1], part_token)
-                del tokens[-1]
-                tokens.append(combine)
-                idx+=1
+    for word in doc:
+        print word.pos_
+        curr_token = token(word.lower_, word.pos_, word.lemma_)
+        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or word.pos_ == 'ADJ':
+            if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
+                tokens.append(curr_token)
             else:
-                idx+=1
+                tokens[-1] =  tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
         else:
-            param = [word.text, word.pos_, word.lemma_]
-            t = token(*param)
-            tokens.append(t)
-            idx+=1
+            tokens.append(curr_token)
     return tokens
+
+def _isNounGroup(token):
+    '''
+    NounGroup includes PART, NOUN, PROPN, ADJ
+    '''
+    if type(token) == tuple:
+        token = token[-1]
+    pos = token.get_pos()
+    return pos == 'PART' or pos == 'NOUN' or pos == 'PROPN' or pos == 'ADJ'
 
 def get_best_synonym(word_token):
     '''get the returned list of synonyms from a given response'''
@@ -117,3 +112,5 @@ def eli5(tokens):
                 word = get_best_synonym(tok)
         words.append(word)
     return ' '.join(words)
+
+tokenize("This is a sentence about aminobutyric acid.")
