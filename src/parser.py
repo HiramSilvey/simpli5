@@ -72,7 +72,8 @@ def get_best_synonym(word_token):
         syn_tokens = synonym.split()
         synonym_len = len(syn_tokens)
         for syn_token in syn_tokens:
-            if syn_token == word:
+            syn_token = syn_token.lower()
+            if syn_token == word.lower():
                 synonym_len -= 1
                 continue
             syn = stem(syn_token)
@@ -112,5 +113,3 @@ def eli5(tokens):
                 word = get_best_synonym(tok)
         words.append(word)
     return ' '.join(words)
-
-tokenize("This is a sentence about aminobutyric acid.")
