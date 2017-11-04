@@ -43,4 +43,3 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
 
     response = urllib2.urlopen(url).next()
     return response
-
