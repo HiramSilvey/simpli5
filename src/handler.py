@@ -12,6 +12,10 @@ KEY = 'key'
 KEY_OUTPUT = 'output'
 OUTPUT_TYPE = 'json'
 
+#Map POS (spaCy form) to api
+#PUNCT, PART, SYM, X, INTJ are insignificant pos
+POS_MAP = {'PUNCT': -1, 'PART': -1, 'SYM': -1, 'X': -1, 'INTJ': -1, 'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)'}
+
 def get_synonyms(response):
     '''get the returned list of synonyms from a given response'''
     synonyms_str = json.loads(response)['response'][0]['list']['synonyms']
@@ -20,7 +24,7 @@ def get_synonyms(response):
 
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
-    
+
     args:
         baseurl -- the base url to use
         path -- the path off of the base url
@@ -31,7 +35,7 @@ def _build_url(baseurl, path, args_dict):
     url_parts[4] = urllib.urlencode(args_dict)
     return urlparse.urlunparse(url_parts)
 
-def request(word, key, output_type = 'json', language = 'en_US'):
+def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
     '''send a request to the thesaurus API
 
     args:
@@ -49,3 +53,6 @@ def request(word, key, output_type = 'json', language = 'en_US'):
 
     response = urllib2.urlopen(url).next()
     return response
+
+print get_synonyms(request("dog"))
+
