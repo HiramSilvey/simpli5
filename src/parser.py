@@ -5,6 +5,7 @@ import json
 from stemming.porter2 import stem
 import nltk
 nlp = spacy.load('en')
+tenK = pickle.load(open('../data/tenK.words', 'rb'))
 
 #Map POS (spaCy form) to api
 #PUNCT, PART, SYM, X, INTJ are insignificant pos
@@ -71,7 +72,6 @@ def get_best_synonym(word_token):
         if w_type['list']['category'] == pos:
             synonyms.extend(w_type['list']['synonyms'].split('|'))
     most_freq = ('', 0)
-    tenK = pickle.load(open('../data/tenK.words', 'rb'))
     for synonym in synonyms:
         score = 0
         syn_tokens = synonym.split()
@@ -104,17 +104,16 @@ def eli5(tokens):
             a = tok[0]
             b = tok[1]
             c = None
-            if len(tuple) == 3:
+            if len(tok) == 3:
                 c = tok[2]
-                word = ' '.join(a.get_word()+b.get_word(), c.get_word())
+                word = a.get_word()+b.get_word() + ' ' + c.get_word()
             else:
                 word = a.get_word() + b.get_word()
             if not a.get_word() in tenK or (c is not None and not c.get_word() in tenK):
-                word = get_best_synonym(token(word, c.get_pos(), word.lemma_))
+                word = get_best_synonym(token(word, c.get_pos(), tok.lemma_))
         else:
             word = tok.get_word()
             if not word in tenK:
                 word = get_best_synonym(tok)
         words.append(word)
     return ' '.join(words)
-tokenize("My grandmother developed Alzheimer's disease.")
