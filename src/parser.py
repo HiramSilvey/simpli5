@@ -9,13 +9,14 @@ tenK = pickle.load(open('../data/tenK.words', 'rb'))
 
 #Map POS (spaCy form) to api
 #PUNCT, PART, SYM, X, INTJ are insignificant pos
-POS_MAP = {'ADJ': '(adj)', 'ADV': '(adv)', 'NOUN': '(noun)', 'VERB': '(verb)'}
+POS_MAP = {'ADJ': '(adj)', 'PROPN': '(noun)',  'ADV': '(adv)', 'NOUN': '(noun)', 'VERB': '(verb)'}
 
 class token:
-    def __init__(self, word, pos, lemma_):
+    def __init__(self, word, pos, lemma_, tag_):
         self.word = word
         self.pos = pos
         self.lemma_ = lemma_
+        self.tag_ = tag_
 
     def get_word(self):
         return self.word
@@ -26,6 +27,10 @@ class token:
     def get_lemma(self):
         return self.lemma_
 
+    def get_tag(self):
+        return self.tag_
+
+
 def tokenize(sentence):
     '''
     Parse sentense and identify the pos and lemma_ of each word.
@@ -35,8 +40,8 @@ def tokenize(sentence):
     tokens = []
     for word in doc:
         print word.pos_
-        curr_token = token(word.lower_, word.pos_, word.lemma_)
-        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or word.pos_ == 'ADJ':
+        curr_token = token(word.lower_, word.pos_, word.lemma_, word.tag_)
+        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or (word.pos_ == 'ADJ' and not word.tag_ == 'PRP$'):
             if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
                 tokens.append(curr_token)
             else:
@@ -52,7 +57,7 @@ def _isNounGroup(token):
     if type(token) == tuple:
         token = token[-1]
     pos = token.get_pos()
-    return pos == 'PART' or pos == 'NOUN' or pos == 'PROPN' or pos == 'ADJ'
+    return pos == 'PART' or pos == 'NOUN' or pos == 'PROPN' or (pos == 'ADJ' and not token.get_tag() == 'PRP$')
 
 def get_best_synonym(word_token):
     '''get the returned list of synonyms from a given response'''
@@ -91,21 +96,26 @@ def get_best_synonym(word_token):
         return word
     return most_freq[0]
 
-def eli5(tokens):
+def simpli5(tokens):
     words = []
     for tok in tokens:
-        word = None
+        word = ""
         if type(tok) == tuple:
-            a = tok[0]
-            b = tok[1]
-            c = None
-            if len(tok) == 3:
-                c = tok[2]
-                word = a.get_word()+b.get_word() + ' ' + c.get_word()
+            simple = True
+            for t in tok:
+                if t.get_pos() == 'PART':
+                    word = word.rstrip(' ')
+                word += t.get_word()
+                word += ' '
+                if not t.get_word() in tenK:
+                    simple = False
+            word = word.rstrip(' ')
+            if tok[-1].get_pos() == 'PART':
+                curr_token = token(word, tok[-2].get_pos(), word, tok[-2].get_tag())
             else:
-                word = a.get_word() + b.get_word()
-            if not a.get_word() in tenK or (c is not None and not c.get_word() in tenK):
-                word = get_best_synonym(token(word, c.get_pos(), tok.lemma_))
+                curr_token = token(word, tok[-1].get_pos(), word, tok[-1].get_tag())
+            if not simple:
+                word = get_best_synonym(curr_token)
         else:
             word = tok.get_word()
             if not word in tenK:
@@ -113,4 +123,6 @@ def eli5(tokens):
         words.append(word)
     return ' '.join(words)
 
-tokenize("This is a sentence about aminobutyric acid.")
+
+tokens = tokenize("I don't like Alzheimer's.")
+print simpli5(tokens)
