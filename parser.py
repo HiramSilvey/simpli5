@@ -28,6 +28,9 @@ class token:
     def get_pos(self):
         return self.pos
 
+    def set_pos(self, pos):
+        self.pos = pos
+
     def get_lemma(self):
         return self.lemma_
 
@@ -39,28 +42,23 @@ def tokenize(sentence):
     Parse sentense and identify the pos and lemma_ of each word.
     Return a tuple (e.g. Alzheimer's disease) when there's a PART pos.
     '''
-    doc = nlp(sentence)
+    doc = nlp(unicode(sentence))
     tokens = []
     for word in doc:
-        print word.pos_
         curr_token = token(word.orth_, word.pos_, word.lemma_, word.tag_)
-        if word.pos_ == 'PART' or word.tag_ == 'RB':
-            if len(tokens) != 0:
-                tokens[-1].set_word(tokens[-1].get_word() + word.orth_)
-            else:
-                tokens.append(curr_token)
-        elif word.pos_ == 'NOUN' or word.pos_ == 'PROPN':
-            if len(tokens) != 0 and _isNounGroup(tokens[-1]):
-                tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
-            else:
-                tokens.append(curr_token)
-        elif word.pos_ == 'ADJ' and not word.tag_ == 'PRP$':
-            if len(tokens) != 0 and (tokens[-1].get_pos() == 'NOUN' or tokens[-1].get_pos() == 'PROPN'):
-                tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
-            else:
-                tokens.append(curr_token)
-        else:
-            tokens.append(curr_token)
+        if (word.pos_ == 'PART' or (word.tag_ == 'RB' and "'" in word.orth_) or (word.pos_ == 'VERB' and "'" in word.orth_)) and len(tokens) != 0:
+            tokens[-1].set_word(tokens[-1].get_word() + word.orth_)
+            continue
+        elif (word.pos_ == 'NOUN' or word.pos_ == 'PROPN') and (len(tokens) != 0 and _isNounGroup(tokens[-1])):
+            tokens[-1].set_word(tokens[-1].get_word() + ' ' + word.orth_)
+            tokens[-1].set_pos(word.pos_)
+            continue
+        elif (word.pos_ == 'ADJ' and not word.tag_ == 'PRP$') and (len(tokens) != 0 and (tokens[-1].get_pos() == 'NOUN' or tokens[-1].get_pos() == 'PROPN')):
+            tokens[-1].set_word(tokens[-1].get_word() + ' ' + word.orth_)
+            continue
+        tokens.append(curr_token)
+    #for tok in tokens:
+    #    print tok.get_word() + ' ' + tok.get_pos()
     return tokens
 
 def _isNounGroup(token):
@@ -119,50 +117,27 @@ def smmrize(paragraph):
     except:
         return paragraph
 
-
 SPECIAL = set(['PART', 'SYM', 'PUNCT', 'SPACE'])
 def simpli5(paragraph):
     tokens = tokenize(paragraph)
     result = ''
-    '''
     for i, tok in enumerate(tokens):
-        result += ' ' if i != 0 and tok.pos_ not in SPECIAL
-    '''
-
-
-def simpli4(paragraph):
-    tokens = tokenize(paragraph)
-    words = []
-    for tok in tokens:
-        word = ""
-        if type(tok) == tuple:
-            simple = True
-            for t in tok:
-                if t.get_pos() == 'PART':
-                    word = word.rstrip(' ')
-                word += t.get_word()
-                word += ' '
-                if not stem(t.get_word()).lower() in tenK:
-                    simple = False
-            word = word.rstrip(' ')
-            if tok[-1].get_pos() == 'PART':
-                curr_token = token(word, tok[-2].get_pos(), word, tok[-2].get_tag())
-            else:
-                curr_token = token(word, tok[-1].get_pos(), word, tok[-1].get_tag())
-            if not simple:
-                word = get_best_synonym(curr_token)
-                link = worker.wiki_request(curr_token.get_word())
-                if link is not None:
-                    link = '[%s](%s)' %(curr_token.get_word(), link)
-                    words.append(link)
-        else:
-            word = tok.get_word()
-            if not stem(word).lower() in tenK and tok.get_pos() != 'PUNCT' and tok.get_pos() != 'PART':
-                word = get_best_synonym(tok)
-                link = worker.wiki_request(tok.get_word())
-                if link is not None:
-                    link = '[%s](%s)' %(tok.get_word(), link)
-                    words.append(link)
-        words.append(word)
-    result =' '.join(words)
-    return result.replace(' .', '.').replace(' ,', ',').replace(" '", "'")
+        text = tok.get_word()
+        pos = tok.get_pos()
+        words = text.split(' ')
+        common = True
+        for word in words:
+            if not stem(word).lower() in tenK and (pos != 'VERB' or "'" not in word):
+                common = False
+                break
+        if not common and pos not in SPECIAL:
+            synonym = get_best_synonym(tok)
+            wiki_link = worker.wiki_request(text)
+            if wiki_link != None:
+                text = '[' + text + '](' + wiki_link + ')'
+            if synonym != text:
+                text = synonym + ' (' + text + ')'
+        if i != 0 and pos not in SPECIAL:
+            result += ' '
+        result += text
+    return result
