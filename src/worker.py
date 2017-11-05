@@ -14,7 +14,7 @@ KEY_OUTPUT = 'output'
 OUTPUT_TYPE = 'json'
 
 WIKI_BASE_URL = "https://en.wikipedia.org/"
-PATH = "w/api.php"
+WIKI_PATH = "w/api.php"
 wiki_args_dict = {"action": "opensearch", "limit": 1, "format": "json"}
 SM_BASE_URL = "http://api.smmry.com/"
 
@@ -49,6 +49,7 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
     args_dict[KEY_LANGUAGE] = language
     url = _build_url(BASE_URL, PATH, args_dict)
 
+    print url
     response = urllib2.urlopen(url).next()
     return response
 
@@ -61,7 +62,7 @@ def wiki_request(word):
     '''
     word = word.replace(' ', '_')
     wiki_args_dict["search"] = word
-    url = _build_url(WIKI_BASE_URL,PATH, wiki_args_dict)
+    url = _build_url(WIKI_BASE_URL,WIKI_PATH, wiki_args_dict)
     try:
         f = urllib2.urlopen(url)
         j = json.loads(f.read())
@@ -79,3 +80,5 @@ def smmry_request(paragraph):
     post = urllib.urlencode(data)
     resp = urllib.urlopen(url, data=post)
     return resp
+request("Alzheimer")
+
