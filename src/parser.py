@@ -38,7 +38,7 @@ def tokenize(sentence):
     doc = nlp(sentence.decode('utf-8'))
     tokens = []
     for word in doc:
-        curr_token = token(word.lower_, word.pos_, word.lemma_, word.tag_)
+        curr_token = token(word, word.pos_, word.lemma_, word.tag_)
         if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or (word.pos_ == 'ADJ' and not word.tag_ == 'PRP$'):
             if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
                 tokens.append(curr_token)
@@ -131,7 +131,6 @@ def simpli5(paragraph):
             if not word in tenK:
                 word = get_best_synonym(tok)
         words.append(word)
-    return ' '.join(words)
+    result =' '.join(words)
+    return result.replace(' .', '.').replace(' ,', ',')
 
-paragraph = "this is so short"
-smmrize(paragraph)
