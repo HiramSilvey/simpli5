@@ -144,7 +144,7 @@ def simpli5(paragraph):
                 text = '[' + text + '](' + wiki_link + ')'
             if synonym != orig:
                 text = synonym + ' (' + text + ')'
-        if i != 0 and pos not in SPECIAL:
+        if i != 0 and pos not in SPECIAL and text != '-' and text != '(':
             result += ' '
         result += text
     return result
