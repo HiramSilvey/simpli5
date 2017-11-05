@@ -39,14 +39,32 @@ def tokenize(sentence):
     doc = nlp(sentence)
     tokens = []
     for word in doc:
+        print word.pos_
         curr_token = token(word.orth_, word.pos_, word.lemma_, word.tag_)
-        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or (word.pos_ == 'ADJ' and not word.tag_ == 'PRP$'):
+        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART':
             if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
                 tokens.append(curr_token)
             else:
                 tokens[-1] =  tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
+        elif word.pos_ == 'ADJ' and not word.tag_ == 'PRP$':
+            if len(tokens) != 0 and (token[-1].get_pos() == 'PART' or token[-1].get_pos() == 'NOUN' or token[-1].get_pos() == 'PROPN'):
+                tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
+            else:
+                tokens.append(curr_token)
+        elif word.tag_ == 'RB' and len(tokens) > 0:
+            combine = token[-1].get_word() + curr_token.get_word()
+
+            tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
         else:
             tokens.append(curr_token)
+    for t in tokens:
+        if type(t) == tuple:
+            print 'tuple'
+            for item in t:
+                print item.get_word(),
+        else:
+            print t.get_word()
+    print len(tokens)
     return tokens
 
 def _isNounGroup(token):
@@ -105,7 +123,18 @@ def smmrize(paragraph):
     except:
         return paragraph
 
+
+SPECIAL = set(['PART', 'SYM', 'PUNCT', 'SPACE'])
 def simpli5(paragraph):
+    tokens = tokenize(paragraph)
+    result = ''
+    '''
+    for i, tok in enumerate(tokens):
+        result += ' ' if i != 0 and tok.pos_ not in SPECIAL
+    '''
+
+
+def simpli4(paragraph):
     tokens = tokenize(paragraph)
     words = []
     for tok in tokens:
@@ -132,7 +161,7 @@ def simpli5(paragraph):
                     words.append(link)
         else:
             word = tok.get_word()
-            if not stem(word).lower() in tenK:
+            if not stem(word).lower() in tenK and tok.get_pos() != 'PUNCT' and tok.get_pos() != 'PART':
                 word = get_best_synonym(tok)
                 link = worker.wiki_request(tok.get_word())
                 if link is not None:
@@ -141,3 +170,6 @@ def simpli5(paragraph):
         words.append(word)
     result =' '.join(words)
     return result.replace(' .', '.').replace(' ,', ',').replace(" '", "'")
+
+tokenize(unicode("Its cat isn't black."))
+
