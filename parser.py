@@ -22,6 +22,9 @@ class token:
     def get_word(self):
         return self.word
 
+    def set_word(self, word):
+        self.word = word
+
     def get_pos(self):
         return self.pos
 
@@ -41,40 +44,33 @@ def tokenize(sentence):
     for word in doc:
         print word.pos_
         curr_token = token(word.orth_, word.pos_, word.lemma_, word.tag_)
-        if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART':
-            if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
-                tokens.append(curr_token)
+        if word.pos_ == 'PART' or word.tag_ == 'RB':
+            if len(tokens) != 0:
+                tokens[-1].set_word(tokens[-1].get_word() + word.orth_)
             else:
-                tokens[-1] =  tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
-        elif word.pos_ == 'ADJ' and not word.tag_ == 'PRP$':
-            if len(tokens) != 0 and (token[-1].get_pos() == 'PART' or token[-1].get_pos() == 'NOUN' or token[-1].get_pos() == 'PROPN'):
+                tokens.append(curr_token)
+        elif word.pos_ == 'NOUN' or word.pos_ == 'PROPN':
+            if len(tokens) != 0 and _isNounGroup(tokens[-1]):
                 tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
             else:
                 tokens.append(curr_token)
-        elif word.tag_ == 'RB' and len(tokens) > 0:
-            combine = token[-1].get_word() + curr_token.get_word()
-
-            tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
+        elif word.pos_ == 'ADJ' and not word.tag_ == 'PRP$':
+            if len(tokens) != 0 and (tokens[-1].get_pos() == 'NOUN' or tokens[-1].get_pos() == 'PROPN'):
+                tokens[-1] = tokens[-1] + (curr_token,) if type(tokens[-1]) == tuple else (tokens[-1], curr_token)
+            else:
+                tokens.append(curr_token)
         else:
             tokens.append(curr_token)
-    for t in tokens:
-        if type(t) == tuple:
-            print 'tuple'
-            for item in t:
-                print item.get_word(),
-        else:
-            print t.get_word()
-    print len(tokens)
     return tokens
 
 def _isNounGroup(token):
     '''
-    NounGroup includes PART, NOUN, PROPN, ADJ
+    NounGroup includes NOUN, PROPN, ADJ
     '''
     if type(token) == tuple:
         token = token[-1]
     pos = token.get_pos()
-    return pos == 'PART' or pos == 'NOUN' or pos == 'PROPN' or (pos == 'ADJ' and not token.get_tag() == 'PRP$')
+    return pos == 'NOUN' or pos == 'PROPN' or (pos == 'ADJ' and not token.get_tag() == 'PRP$')
 
 def get_best_synonym(word_token):
     '''get the returned list of synonyms from a given response'''
@@ -170,6 +166,3 @@ def simpli4(paragraph):
         words.append(word)
     result =' '.join(words)
     return result.replace(' .', '.').replace(' ,', ',').replace(" '", "'")
-
-tokenize(unicode("Its cat isn't black."))
-
