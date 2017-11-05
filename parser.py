@@ -46,7 +46,7 @@ def tokenize(sentence):
     tokens = []
     for word in doc:
         curr_token = token(word.orth_, word.pos_, word.lemma_, word.tag_)
-        if (word.pos_ == 'PART' or (word.tag_ == 'RB' and "'" in word.orth_) or (word.pos_ == 'VERB' and "'" in word.orth_)) and len(tokens) != 0:
+        if ((word.pos_ == 'PART' and word.tag_ != 'TO' and word.tag_ != 'RP') or (word.tag_ == 'RB' and "'" in word.orth_) or (word.pos_ == 'VERB' and "'" in word.orth_)) and len(tokens) != 0:
             tokens[-1].set_word(tokens[-1].get_word() + word.orth_)
             continue
         elif (word.pos_ == 'NOUN' or word.pos_ == 'PROPN') and (len(tokens) != 0 and _isNounGroup(tokens[-1])):
@@ -117,7 +117,7 @@ def smmrize(paragraph):
     except:
         return paragraph
 
-SPECIAL = set(['PART', 'SYM', 'PUNCT', 'SPACE'])
+SPECIAL = set(['SYM', 'PUNCT', 'SPACE'])
 def simpli5(paragraph):
     tokens = tokenize(paragraph)
     result = ''
@@ -130,13 +130,13 @@ def simpli5(paragraph):
             if not stem(word).lower() in tenK and (pos != 'VERB' or "'" not in word):
                 common = False
                 break
-        if not common and pos not in SPECIAL and pos != 'PRON':
-            print text + ', ' + pos
+        if not common and pos not in SPECIAL and pos != 'PRON' and len(text) > 1:
             synonym = get_best_synonym(tok)
             wiki_link = worker.wiki_request(text)
+            orig = text
             if wiki_link != None:
                 text = '[' + text + '](' + wiki_link + ')'
-            if synonym != text:
+            if synonym != orig:
                 text = synonym + ' (' + text + ')'
         if i != 0 and pos not in SPECIAL:
             result += ' '
