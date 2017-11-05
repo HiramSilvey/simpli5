@@ -55,7 +55,7 @@ def _build_url(baseurl, path, args_dict):
     '''
     url_parts = list(urlparse.urlparse(baseurl))
     url_parts[2] = path
-    url_parts[4] = urllib.urlencode(args_dict)
+    url_parts[4] = urllib.urlencode(encode_obj(args_dict))
     return urlparse.urlunparse(url_parts)
 
 def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
@@ -90,12 +90,15 @@ def wiki_request(word):
     try:
         f = urllib2.urlopen(url)
         j = json.loads(f.read())
+        print j
         link_url = j[-1][0].encode('utf-8')
         return link_url
     except urllib2.HTTPError, e:
         print(e.code)
     except urllib2.URLError, e:
         print(e.args)
+    except:
+        return None
 
 def smmry_request(paragraph):
     url = _build_url(SM_BASE_URL,"", sm_args_dict)

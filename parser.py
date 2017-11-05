@@ -106,7 +106,7 @@ def smmrize(paragraph):
         return paragraph
 
 def simpli5(paragraph):
-    tokens = tokenize(paragraph.decode('unicode_escape').encode('ascii', 'ignore'))
+    tokens = tokenize(paragraph)
     words = []
     for tok in tokens:
         word = ""
@@ -127,15 +127,17 @@ def simpli5(paragraph):
             if not simple:
                 word = get_best_synonym(curr_token)
                 link = worker.wiki_request(curr_token.get_word())
-                link = '[%s](%s)' %(curr_token.get_word(), link)
-                words.append(link)
+                if link is not None:
+                    link = '[%s](%s)' %(curr_token.get_word(), link)
+                    words.append(link)
         else:
             word = tok.get_word()
             if not stem(word).lower() in tenK:
                 word = get_best_synonym(tok)
                 link = worker.wiki_request(tok.get_word())
-                link = '[%s](%s)' %(tok.get_word(), link)
-                words.append(link)
+                if link is not None:
+                    link = '[%s](%s)' %(tok.get_word(), link)
+                    words.append(link)
         words.append(word)
     result =' '.join(words)
     return result.replace(' .', '.').replace(' ,', ',').replace(" '", "'")
