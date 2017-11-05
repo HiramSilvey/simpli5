@@ -1,4 +1,4 @@
-import handler
+import worker
 import pickle
 import spacy
 import json
@@ -64,7 +64,7 @@ def get_best_synonym(word_token):
     word = word_token.get_word()
     try:
         pos = POS_MAP[word_token.get_pos()]
-        json_resp = json.loads(handler.request(word))['response']
+        json_resp = json.loads(worker.request(word))['response']
     except:
         return word
     synonyms = []

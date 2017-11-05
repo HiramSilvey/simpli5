@@ -5,6 +5,7 @@ import json
 from IPython import embed
 
 API_KEY = "0chdxJar9tkwkFEAfoyf"
+SM_KEY = "2B269D5CE2"
 BASE_URL = "http://thesaurus.altervista.org/"
 PATH = "thesaurus/v1"
 KEY_WORD = "word"
@@ -16,6 +17,10 @@ OUTPUT_TYPE = 'json'
 WIKI_BASE_URL = "https://en.wikipedia.org/"
 PATH = "w/api.php"
 wiki_args_dict = {"action": "opensearch", "limit": 1, "format": "json"}
+SM_BASE_URL = "http://api.smmry.com/"
+SM_API_INPUT_KEY = "sm_api_input"
+
+sm_args_dict = {"SM_API_KEY": SM_KEY }
 
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
@@ -66,8 +71,22 @@ def wiki_request(word):
         print link_url
         return link_url
     except urllib2.HTTPError, e:
-            print(e.code)
+        print(e.code)
     except urllib2.URLError, e:
-            print(e.args)
+        print(e.args)
+
+def smmary_request(paragraph):
+    sm_args_dict[SM_API_INPUT_KEY] = paragraph
+    url = _build_url(SM_BASE_URL,"", sm_args_dict)
+    print url
+    try:
+        f = urllib2.urlopen(url)
+        embed()
+    except urllib2.HTTPError, e:
+        print(e.code)
+    except urllib2.URLError, e:
+        print(e.args)
 
 
+s = "This is a sentence. hahahaha."
+smmary_request(s)
