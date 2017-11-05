@@ -80,5 +80,4 @@ def smmry_request(paragraph):
     post = urllib.urlencode(data)
     resp = urllib.urlopen(url, data=post)
     return resp
-request("Alzheimer")
 
