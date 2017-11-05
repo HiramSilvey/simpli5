@@ -2,7 +2,6 @@ import urllib
 import urlparse
 import urllib2
 import json
-from IPython import embed
 
 API_KEY = "0chdxJar9tkwkFEAfoyf"
 SM_KEY = "2B269D5CE2"
@@ -18,9 +17,8 @@ WIKI_BASE_URL = "https://en.wikipedia.org/"
 PATH = "w/api.php"
 wiki_args_dict = {"action": "opensearch", "limit": 1, "format": "json"}
 SM_BASE_URL = "http://api.smmry.com/"
-SM_API_INPUT_KEY = "sm_api_input"
 
-sm_args_dict = {"SM_API_KEY": SM_KEY }
+sm_args_dict = {"SM_API_KEY": SM_KEY}
 
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
@@ -75,18 +73,9 @@ def wiki_request(word):
     except urllib2.URLError, e:
         print(e.args)
 
-def smmary_request(paragraph):
-    sm_args_dict[SM_API_INPUT_KEY] = paragraph
+def smmry_request(paragraph):
     url = _build_url(SM_BASE_URL,"", sm_args_dict)
-    print url
-    try:
-        f = urllib2.urlopen(url)
-        embed()
-    except urllib2.HTTPError, e:
-        print(e.code)
-    except urllib2.URLError, e:
-        print(e.args)
-
-
-s = "This is a sentence. hahahaha."
-smmary_request(s)
+    data = {'sm_api_input': paragraph}
+    post = urllib.urlencode(data)
+    resp = urllib.urlopen(url, data=post)
+    return resp

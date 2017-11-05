@@ -30,7 +30,6 @@ class token:
     def get_tag(self):
         return self.tag_
 
-
 def tokenize(sentence):
     '''
     Parse sentense and identify the pos and lemma_ of each word.
@@ -96,6 +95,8 @@ def get_best_synonym(word_token):
     if most_freq[1] == 0:
         return word
     return most_freq[0]
+
+def smmrize(paragraph):
 
 def simpli5(tokens):
     words = []
