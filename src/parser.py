@@ -97,8 +97,16 @@ def get_best_synonym(word_token):
     return most_freq[0]
 
 def smmrize(paragraph):
+    f = worker.smmry_request(paragraph)
+    s =  f.read()
+    j = json.loads(s)
+    try:
+        return j["sm_api_content"]
+    except:
+        return paragraph
 
-def simpli5(tokens):
+def simpli5(paragraph):
+    tokens = tokenize(paragraph)
     words = []
     for tok in tokens:
         word = ""
@@ -124,3 +132,6 @@ def simpli5(tokens):
                 word = get_best_synonym(tok)
         words.append(word)
     return ' '.join(words)
+
+paragraph = "this is so short"
+smmrize(paragraph)
