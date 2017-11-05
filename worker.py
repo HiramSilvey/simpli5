@@ -20,6 +20,31 @@ SM_BASE_URL = "http://api.smmry.com/"
 
 sm_args_dict = {"SM_API_KEY": SM_KEY}
 
+def encode_obj(in_obj):
+
+    def encode_list(in_list):
+        out_list = []
+        for el in in_list:
+            out_list.append(encode_obj(el))
+        return out_list
+
+    def encode_dict(in_dict):
+        out_dict = {}
+        for k, v in in_dict.iteritems():
+            out_dict[k] = encode_obj(v)
+        return out_dict
+
+    if isinstance(in_obj, unicode):
+        return in_obj.encode('utf-8')
+    elif isinstance(in_obj, list):
+        return encode_list(in_obj)
+    elif isinstance(in_obj, tuple):
+        return tuple(encode_list(in_obj))
+    elif isinstance(in_obj, dict):
+        return encode_dict(in_obj)
+
+    return in_obj
+
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
 
@@ -49,7 +74,6 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
     args_dict[KEY_LANGUAGE] = language
     url = _build_url(BASE_URL, PATH, args_dict)
 
-    print url
     response = urllib2.urlopen(url).next()
     return response
 
@@ -67,7 +91,6 @@ def wiki_request(word):
         f = urllib2.urlopen(url)
         j = json.loads(f.read())
         link_url = j[-1][0].encode('utf-8')
-        print link_url
         return link_url
     except urllib2.HTTPError, e:
         print(e.code)
@@ -77,7 +100,7 @@ def wiki_request(word):
 def smmry_request(paragraph):
     url = _build_url(SM_BASE_URL,"", sm_args_dict)
     data = {'sm_api_input': paragraph}
-    post = urllib.urlencode(data)
+    post = urllib.urlencode(encode_obj(data))
     resp = urllib.urlopen(url, data=post)
     return resp
 
