@@ -133,4 +133,4 @@ def simpli5(paragraph):
                 word = get_best_synonym(tok)
         words.append(word)
     result =' '.join(words)
-    return result.replace(' .', '.').replace(' ,', ',')
+    return result.replace(' .', '.').replace(' ,', ',').replace(" '", "'")
