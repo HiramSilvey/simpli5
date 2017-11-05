@@ -92,7 +92,6 @@ def wiki_request(word):
     try:
         f = urllib2.urlopen(url)
         j = json.loads(f.read())
-        print j
         link_url = j[-1][0].encode('utf-8')
         return link_url
     except urllib2.HTTPError, e:
