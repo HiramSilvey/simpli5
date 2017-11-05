@@ -5,7 +5,7 @@ import json
 from stemming.porter2 import stem
 import nltk
 nlp = spacy.load('en')
-tenK = pickle.load(open('../data/tenK.words', 'rb'))
+tenK = pickle.load(open('data/tenK.words', 'rb'))
 
 #Map POS (spaCy form) to api
 #PUNCT, PART, SYM, X, INTJ are insignificant pos
