@@ -36,7 +36,7 @@ def tokenize(sentence):
     Parse sentense and identify the pos and lemma_ of each word.
     Return a tuple (e.g. Alzheimer's disease) when there's a PART pos.
     '''
-    doc = nlp(sentence.decode('utf-8'))
+    doc = nlp(sentence)
     tokens = []
     for word in doc:
         curr_token = token(word.orth_, word.pos_, word.lemma_, word.tag_)
