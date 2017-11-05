@@ -74,7 +74,6 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
     args_dict[KEY_LANGUAGE] = language
     url = _build_url(BASE_URL, PATH, args_dict)
 
-    print url
     response = urllib2.urlopen(url).next()
     return response
 
@@ -92,7 +91,6 @@ def wiki_request(word):
         f = urllib2.urlopen(url)
         j = json.loads(f.read())
         link_url = j[-1][0].encode('utf-8')
-        print link_url
         return link_url
     except urllib2.HTTPError, e:
         print(e.code)

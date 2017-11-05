@@ -71,7 +71,6 @@ def get_best_synonym(word_token):
         if w_type['list']['category'] == pos:
             synonyms.extend(w_type['list']['synonyms'].split('|'))
     most_freq = ('', 0)
-    print synonyms
     for synonym in synonyms:
         score = 0
         syn_tokens = synonym.split()
