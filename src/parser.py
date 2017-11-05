@@ -132,6 +132,3 @@ def simpli5(paragraph):
                 word = get_best_synonym(tok)
         words.append(word)
     return ' '.join(words)
-
-paragraph = "this is so short"
-smmrize(paragraph)
