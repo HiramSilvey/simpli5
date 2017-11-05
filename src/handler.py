@@ -2,6 +2,7 @@ import urllib
 import urlparse
 import urllib2
 import json
+from IPython import embed
 
 API_KEY = "0chdxJar9tkwkFEAfoyf"
 BASE_URL = "http://thesaurus.altervista.org/"
@@ -12,8 +13,9 @@ KEY = 'key'
 KEY_OUTPUT = 'output'
 OUTPUT_TYPE = 'json'
 
-WIKI_BASE_URL = "https://en.wikipedia.org/wiki/"
-
+WIKI_BASE_URL = "https://en.wikipedia.org/"
+PATH = "w/api.php"
+wiki_args_dict = {"action": "opensearch", "limit": 1, "format": "json"}
 
 def _build_url(baseurl, path, args_dict):
     '''return a list in the structure of urlparse.ParseResult
@@ -49,13 +51,23 @@ def request(word, key=API_KEY, output_type = 'json', language = 'en_US'):
 
 def wiki_request(word):
     '''
-    Send GET request to wiki
+    Send GET request to wiki API which auto complete a search term (e.g. Alzheimer's to Alzheimer's disease)
+
+    args:
+        word -- the word (can be incomplete) that is searched
     '''
     word = word.replace(' ', '_')
-    word = word.replace("'", "%27")
+    wiki_args_dict["search"] = word
+    url = _build_url(WIKI_BASE_URL,PATH, wiki_args_dict)
+    try:
+        f = urllib2.urlopen(url)
+        j = json.loads(f.read())
+        link_url = j[-1][0].encode('utf-8')
+        print link_url
+        return link_url
+    except urllib2.HTTPError, e:
+            print(e.code)
+    except urllib2.URLError, e:
+            print(e.args)
 
-    url = _build_url(WIKI_BASE_URL,word, {})
-    print url
-    return url
-wiki_request("Alzheimer's disease")
 
