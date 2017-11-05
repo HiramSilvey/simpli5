@@ -136,7 +136,7 @@ def simpli5(paragraph):
             if not stem(word).lower() in tenK and (pos != 'VERB' or "'" not in word):
                 common = False
                 break
-        if not common and pos not in SPECIAL and pos != 'PRON' and len(text) > 1:
+        if not common and pos not in SPECIAL and pos != 'PRON' and len(text) > 1 and pos != 'NUM':
             synonym = get_best_synonym(tok)
             wiki_link = worker.wiki_request(text)
             orig = text
