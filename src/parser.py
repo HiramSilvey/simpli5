@@ -38,7 +38,6 @@ def tokenize(sentence):
     doc = nlp(sentence.decode('utf-8'))
     tokens = []
     for word in doc:
-        print word.pos_
         curr_token = token(word.lower_, word.pos_, word.lemma_, word.tag_)
         if word.pos_ == 'NOUN' or word.pos_ == 'PROPN' or word.pos_ == 'PART' or (word.pos_ == 'ADJ' and not word.tag_ == 'PRP$'):
             if len(tokens) == 0 or not _isNounGroup(tokens[-1]):
@@ -71,6 +70,7 @@ def get_best_synonym(word_token):
         if w_type['list']['category'] == pos:
             synonyms.extend(w_type['list']['synonyms'].split('|'))
     most_freq = ('', 0)
+    print synonyms
     for synonym in synonyms:
         score = 0
         syn_tokens = synonym.split()
