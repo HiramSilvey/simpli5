@@ -21,7 +21,9 @@ SM_BASE_URL = "http://api.smmry.com/"
 sm_args_dict = {"SM_API_KEY": SM_KEY}
 
 def encode_obj(in_obj):
-
+    '''
+    return the unicode of a string
+    '''
     def encode_list(in_list):
         out_list = []
         for el in in_list:
@@ -101,6 +103,12 @@ def wiki_request(word):
         return None
 
 def smmry_request(paragraph):
+    '''
+    Send request to smmry api
+
+    args:
+        paragraph -- the paragraph that needs to be summarized
+    '''
     url = _build_url(SM_BASE_URL,"", sm_args_dict)
     data = {'sm_api_input': paragraph}
     post = urllib.urlencode(encode_obj(data))

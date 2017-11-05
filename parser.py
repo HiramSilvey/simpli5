@@ -109,6 +109,9 @@ def get_best_synonym(word_token):
     return most_freq[0]
 
 def smmrize(paragraph):
+    '''
+    Summarize paragraph to 7 sentences with smmrize API.
+    '''
     f = worker.smmry_request(paragraph)
     s =  f.read()
     j = json.loads(s)
@@ -119,6 +122,9 @@ def smmrize(paragraph):
 
 SPECIAL = set(['SYM', 'PUNCT', 'SPACE'])
 def simpli5(paragraph):
+    '''
+    Simplify paragraph by replacing uncommon vocabs with a common synonym.
+    '''
     tokens = tokenize(paragraph)
     result = ''
     for i, tok in enumerate(tokens):
